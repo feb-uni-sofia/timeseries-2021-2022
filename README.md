@@ -24,8 +24,7 @@ that is linked to your student id. Homeworks and final projects are assigned to 
 
 ## Software
 
-For the exercise classes you need a working installation of both R and R studio desktop (follow the links below).
-If you encounter problems with the installation, please email me or ask me during one of the online meetings.
+For the exercise classes you need a working installation of both R and R studio desktop (follow the links below). Note that R Studio will not work without R, so please install R first (use the default settings during the installation). If you encounter problems with the installation, please email me or ask me during one of the online meetings.
 
 [R download](https://cran.r-project.org/)
 
