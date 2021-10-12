@@ -22,3 +22,12 @@ bitcoins <- read.csv(
 ```
 
 
+- Plot the time series
+- Compute the average exchange rate for June 2017
+- Compute the average exchange rate for October 2017
+- Compute the average exchange rate before and after October 2017
+- Compute the standard deviation for the three periods
+- Compute the average exchange rate for every week during the observation period
+- Compute the standard deviation of the exchange rate for every week during the observation period
+- Create a scatterplot for the exchange rate time series and its first lag
+
