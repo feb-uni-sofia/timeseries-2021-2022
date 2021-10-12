@@ -1,0 +1,25 @@
+---
+title: "Въведение в анализ на времеви редове"
+author: "Boyko Amarov"
+date: "10/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Въведение
+
+```{r}
+# install.packages("xts")
+library(xts)
+
+bitcoins <- read.csv(
+  'https://s3.eu-central-1.amazonaws.com/sf-timeseries/data/bitcoin2017-06-01-2017-11-13.csv', 
+  stringsAsFactors = FALSE
+)
+```
+
+
+
