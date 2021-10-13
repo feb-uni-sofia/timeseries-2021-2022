@@ -4,7 +4,7 @@
 
 All meetings take place online via Skype: [https://join.skype.com/GpbZKl6hMiNz](https://join.skype.com/GpbZKl6hMiNz)
 
-- Tuesday, 14:00-15:30
+- Tuesday, 14:00-15:30 (BG)
 - Tuesday, 18:30-20:00
 - Wednesday, 12:00-13:30
 - Wednesday, 18:00-19:30
