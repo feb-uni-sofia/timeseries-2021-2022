@@ -1,0 +1,50 @@
+---
+title: "Въведение в анализ на времеви редове"
+author: "Boyko Amarov"
+date: "10/12/2021"
+output: html_document
+---
+
+# Time series in R
+
+```{r}
+library(xts)
+library(ggplot2)
+
+bitcoins <- read.csv(
+  'https://s3.eu-central-1.amazonaws.com/sf-timeseries/data/bitcoin2017-06-01-2017-11-13.csv', 
+  stringsAsFactors = FALSE
+)
+bc_ts <- xts(bitcoins$close, order.by = as.Date(bitcoins$Index))
+```
+
+
+$$
+y = (y_{1}, y_{2}, y_{3}, \ldots, y_{T})
+$$
+
+$$
+y_{t}, t = 1,\ldots,T\\
+y_{t - 1}: \text{first lag of } y_t \\
+y_{t - 2}: \text{second lag of } y_t
+$$
+In the bitcoins example $T = 117$.
+
+```{r}
+# Първи лаг на биткойн времевия ред
+bc_ts_l1 <- lag(bc_ts)
+bc_ts_l2 <- lag(bc_ts, k = 2)
+bc_all_lags <- cbind(bc_ts, bc_ts_l1, bc_ts_l2)
+```
+
+```{r}
+mean(bc_ts_l1, na.rm = TRUE)
+```
+
+```{r}
+ggplot(data.frame(x = bc_ts_l1, y = bc_ts), aes(x = x, y = y)) + 
+  geom_point() + 
+  ggtitle('Scatterplot на USD/BTC against first lag') +
+  ylab('USD/BTC t') + 
+  xlab('USD/BTC (t - 1)')
+```
