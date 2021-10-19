@@ -5,15 +5,13 @@ date: "10/12/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-# Въведение
+# Времеви редове в R
 
 ```{r}
-# install.packages("xts")
+# install.packages(c("xts", "ggplot2"))
+
 library(xts)
+library(ggplot2)
 
 bitcoins <- read.csv(
   'https://s3.eu-central-1.amazonaws.com/sf-timeseries/data/bitcoin2017-06-01-2017-11-13.csv', 
@@ -21,5 +19,68 @@ bitcoins <- read.csv(
 )
 ```
 
+```{r}
+# extended time series
+# В името използвам _ts, за да означа, че това е обект с времеви ред
+bc_ts <- xts(bitcoins$close, order.by = as.Date(bitcoins$Index))
+```
 
+```{r}
+plot(bc_ts)
+```
+## Въпрос: колко е средният обменен курс през юни 2016?
+
+```{r}
+bc_ts["2017-06"]
+```
+
+```{r}
+mean(bc_ts["2017-06"])
+```
+## Въпрос: колко е средният обменен курс през юни 2016?
+
+```{r}
+mean(bc_ts["2017-10"])
+```
+
+## Въпрос: колко е средният обменен курс до края на август 2017?
+
+```{r}
+mean(bc_ts["/2017-08"])
+```
+## Въпрос: колко е средният обменен курс за всяка седмица?
+
+```{r}
+weekly_bc_means <- apply.weekly(bc_ts, mean)
+plot(weekly_bc_means)
+```
+
+## Въпрос: колко е стандартното отклонение на обменния курс за всяка седмица?
+
+Стандартното 
+
+```{r}
+weekly_bc_sd <- apply.weekly(bc_ts, sd)
+plot(weekly_bc_sd)
+```
+$$
+y = (y_{1}, y_{2}, y_{3}, \ldots, y_{T})
+$$
+
+$$
+y_{t}, t = 1,\ldots,T\\
+y_{t - 1}: \text{първи лаг на } y_t \\
+y_{t - 2}: \text{втори лаг на } y_t
+$$
+В случая с Bitcoin $T = 117$.
+
+```{r}
+bc_ts_l1 <- lag(bc_ts)
+
+ggplot(data.frame(x = bc_ts_l1, y = bc_ts), aes(x = x, y = y)) + 
+  geom_point() + 
+  ggtitle('Scatterplot of USD/BTC rates against previous day values.') +
+  ylab('USD/BTC') + 
+  xlab('USD/BTC t - 1')
+```
 

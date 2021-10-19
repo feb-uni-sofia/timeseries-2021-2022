@@ -11,7 +11,11 @@ All meetings take place online via Skype: [https://join.skype.com/GpbZKl6hMiNz](
 
 ## Class notes
 
-TBA
+Class notes are available as Rmd files in this repository. You can access
+the compiled notes under
+
+(https://boyko.github.io/timeseries-bg/)[https://boyko.github.io/timeseries-bg/] (in Bulgarian)
+(https://boyko.github.io/timeseries/)[https://boyko.github.io/timeseries/] (in English)
 
 ## Grading
 
