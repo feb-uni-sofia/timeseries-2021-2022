@@ -18,6 +18,8 @@ the compiled notes under
 
 [https://boyko.github.io/timeseries/](https://boyko.github.io/timeseries/) (in English)
 
+Notes from econometrics [https://feb-uni-sofia.github.io/econometrics-script](https://feb-uni-sofia.github.io/econometrics-script)
+
 ## Grading
 
 The final grade for the exercise classes is formed on the basis of a final (group) project after the end of the term. Details to be announced.
