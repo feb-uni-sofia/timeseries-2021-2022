@@ -5,12 +5,17 @@ date: "11/2/2021"
 output: html_document
 ---
 
-# Autoregressive processes
+# ARIMA
 
 Time series process: sequence of random variables
 
 $$
 y_1, y_2,\ldots,y_{T}
+$$
+
+AR(1)
+$$
+y_{t} = \delta + \alpha y_{t - 1} + e_t
 $$
 
 Statistical properties:
@@ -21,11 +26,18 @@ E(y_t) = ?
 $$
 2. Variance
 
+Expected squared deviation from the expected value.
+
 $$
-Var(y_t) = E[(y_{t} - E(y_t))^2]
+Var(y_t) := E[(y_{t} - E(y_t))^2]
 $$
 
+
 3. Autocovariances/autocorrelations of time series
+
+$$
+Cov(y_{t}, y_{t - 1}) := E\left(y_{t} - E(y_{t})\right)(y_{t - 1} - E(y_{t - 1}))
+$$
 
 $$
 Cov(y_t, y_{t - 1}) \text{ 1st order autocovariance}\\
@@ -37,6 +49,20 @@ Cov(y_t, y_{t - k}) \text{ k-th order autocovariance}\\
 \vdots\\
 \rho(y_{t}, y_{t - k}) = \frac{Cov(y_t, y_{t - k})}{Var(y_t)} \text{ k-th order autocorrelation}\\
 $$
+The autocorrelations do not depend on the unit of measurement of the series and 
+are all (unitless) numbers between -1 and 1:
+
+
+$$
+-1 \leq \rho(y_{t}, y_{t - k}) \leq 1.
+$$
+Autocorrelation of 1 between e.g. $y_{t}$ and $y_{t - 1}$ means that $y_{t}$ is a
+linear function of $y_{t - 1}$ (with a positive slope coefficient).
+
+Autocorrelation of -1 between e.g. $y_{t}$ and $y_{t - 1}$ means that $y_{t}$ is a
+linear function of $y_{t - 1}$ (with a negative slope coefficient).
+
+
 ```{r}
 ## For illustration only
 
@@ -71,34 +97,40 @@ sim_data %>%
     StdDev = sd(y)
   )
 ```
+
 Covariance
 
 $$
 \begin{aligned}
-  y_{1,t} & = e_{1, t}\\
-  y_{2, t} & = 2 y_{1, t} + e_{2,t}
+  x_{t} & = u_{t}\\
+  y_{t} & = -2 x_{t} + e_{t}
 \end{aligned}
 $$
 
+
 ```{r}
 n <- 100
-y1 <- rnorm(n = n, mean = 0, sd = 1)
-y2 <- rnorm(n = n, mean = 0, sd = 1)
+x <- rnorm(n = n, mean = 0, sd = 1)
+y <- 2 * x + rnorm(n = n, mean = 0, sd = 1)
 
-tibble(y1, y2) %>%
-  ggplot(aes(x = y1, y = y2)) +
+tibble(y, x) %>%
+  ggplot(aes(x = x, y = y)) +
     geom_point()
 
-cov(y1, y2)
-cor(y1, y2)
+cov(x, y)
+cor(x, y)
 ```
 
 
 ## AR(1)
 
+Autoregressive, because the model equation contains lags of the time
+series $y_{t-1}, y_{t - 2}, \ldots, y_{t - k}$.
+
 $$
 y_{t} = 2 + 0.5y_{t - 1} + e_{t}
 $$
+
 $e_t$ is a purely random process (white noise process).
 
 $$
@@ -109,10 +141,78 @@ $$
 $$
 e_{t} \sim WN(\sigma^2)
 $$
+Expected value of the AR(1) process
+
+$$
+y_{t} = 2 + 0.5y_{t - 1} + e_{t}, \quad e_{t} \sim WN(\sigma^2)
+$$
+
+$$
+\begin{aligned}
+  E(y_t) & = E(2 + 0.5y_{t - 1} + e_{t}) \text{ because of linearity}\\
+         & = E(2) + E(0.5y_{t - 1}) + E(e_t) \\
+         & = 2 + 0.5 E(y_{t - 1}) + 0 \\
+  E(y_t) & = 2 + 0.5 E(y_{t - 1})\\
+\end{aligned}
+$$
+Let us assume that the expected value of the process does not change over
+time (does not depend on the time index $t$). In other words we assume that
+the process is **mean stationary** (expected value does not change over time).
+
+$$
+E(y_{t}) = E(y_{t - 1}) = \mu
+$$
+Then the equation for the expected values is:
 
 
+$$
+\begin{aligned}
+  \mu & = 2 + 0.5 \mu\\
+  (1 - 0.5) \mu & = 2 \implies\\
+  \mu & = \frac{2}{1 - 0.5} = 4
+\end{aligned}
+$$
 
 
+$$
+y_{t} = \delta + \alpha y_{t - 1} + e_t, \quad e_t \sim WN(\sigma^2)
+$$
 
+$$
+E(y_{t}) = \frac{\delta}{1 - \alpha}
+$$
 
+$$
+\begin{aligned}
+  Var(y_{t}) & = Var(2 + 0.5y_{t - 1} + e_{t}) \\
+             & = Var(2) + Var(0.5y_{t - 1} + e_{t}) \\
+             & = 0 + Var(0.5y_{t - 1} + e_{t}) \\
+             & = Var(0.5y_{t - 1} + e_{t}) \\
+             & = Var(0.5y_{t - 1}) + Var(e_{t}) + 2Cov(0.5y_{t - 1}, e_{t})\\
+             & = 0.5^2Var(y_{t - 1}) + \sigma^2 + 2\cdot 0.5 Cov(y_{t - 1}, e_{t})\\
+  Var(y_{t}) & = 0.5^2Var(y_{t - 1}) + \sigma^2
+\end{aligned}
+$$
+$$
+Var(y_{t}) = Var(y_{t - 1}) = \gamma
+$$
+$$
+\begin{aligned}
+  \gamma & = 0.5^2 \gamma + \sigma^2\\
+  (1 - 0.5^2)\gamma & = \sigma^2\\
+  \gamma & = \frac{\sigma^2}{1 - 0.5^2}
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+  \gamma = \frac{\sigma^2}{1 - \alpha^2}
+\end{aligned}
+$$
+
+Homework: explain why
+
+$$
+Cov(y_{t - 1}, e_t) = 0
+$$
 
