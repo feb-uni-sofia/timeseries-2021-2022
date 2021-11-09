@@ -134,9 +134,9 @@ $$
 $e_t$ is a purely random process (white noise process).
 
 $$
-E(e_t) = 0\\
-Var(e_t) = \sigma^2\\
-Cov(e_t, e_{t - k}) = 0, k \neq 0
+E(e_t) = 0, \text{ for every } t\\
+Var(e_t) = \sigma^2 \text{ for every }  t\\
+Cov(e_t, e_{t - k}) = 0, \text{ for every } k \neq 0
 $$
 $$
 e_{t} \sim WN(\sigma^2)
@@ -181,38 +181,102 @@ $$
 $$
 E(y_{t}) = \frac{\delta}{1 - \alpha}
 $$
-
+New: lag-operator
 $$
-\begin{aligned}
-  Var(y_{t}) & = Var(2 + 0.5y_{t - 1} + e_{t}) \\
-             & = Var(2) + Var(0.5y_{t - 1} + e_{t}) \\
-             & = 0 + Var(0.5y_{t - 1} + e_{t}) \\
-             & = Var(0.5y_{t - 1} + e_{t}) \\
-             & = Var(0.5y_{t - 1}) + Var(e_{t}) + 2Cov(0.5y_{t - 1}, e_{t})\\
-             & = 0.5^2Var(y_{t - 1}) + \sigma^2 + 2\cdot 0.5 Cov(y_{t - 1}, e_{t})\\
-  Var(y_{t}) & = 0.5^2Var(y_{t - 1}) + \sigma^2
-\end{aligned}
-$$
-$$
-Var(y_{t}) = Var(y_{t - 1}) = \gamma
-$$
-$$
-\begin{aligned}
-  \gamma & = 0.5^2 \gamma + \sigma^2\\
-  (1 - 0.5^2)\gamma & = \sigma^2\\
-  \gamma & = \frac{\sigma^2}{1 - 0.5^2}
-\end{aligned}
+Ly_{t} = y_{t - 1}
 $$
 
 $$
 \begin{aligned}
-  \gamma = \frac{\sigma^2}{1 - \alpha^2}
+y_{t} & = \delta + \alpha y_{t - 1} + e_t\\
+y_{t} & = \delta + \alpha Ly_{t} + e_t\\
+(1 - \alpha L) y_{t} & = \delta + e_t\\
+y_{t} & = \frac{\delta}{1 - \alpha L} + \frac{e_t}{1 - \alpha L}\\
+\end{aligned}
+$$
+$$
+S_{n} = 1 + \alpha + \alpha^2 + \alpha^3 + \ldots + \alpha^n\\
+\lim_{n \to \infty} S_{n} = \frac{1}{1 - \alpha} \text{ for } |\alpha| < 1
+$$
+```{r}
+n <- 60
+alpha <- 0.5
+sum((alpha)^(0:n))
+```
+
+$$
+\text{ For } |\alpha| < 1\\
+\begin{aligned}
+y_{t} & = \frac{\delta}{1 - \alpha L} + \frac{e_t}{1 - \alpha L}\\
+y_{t} & = \delta (1 + \alpha L + \alpha^2L^2 + \ldots) + e_{t}(1 + \alpha L + \alpha^2L^2 + \ldots) \\
+y_{t} & = \delta (1 + \alpha + \alpha^2 + \ldots) + e_{t}(1 + \alpha L + \alpha^2L^2 + \ldots) \\
+y_{t} & = \frac{\delta}{1 - \alpha} + e_{t}(1 + \alpha L + \alpha^2L^2 + \ldots) \\
+y_{t} & = \frac{\delta}{1 - \alpha} + (e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots) \\
+\end{aligned}
+$$
+$$
+\begin{aligned}
+y_{t} & = \frac{\delta}{1 - \alpha} + (\alpha^{0}e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots) \\
+y_{t} & = \frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} e_{t - k} \\
 \end{aligned}
 $$
 
-Homework: explain why
+<!-- \alpha^{k}e_t \text{ for } k = 1 \implies \alpha^{1}e_{t - 1} -->
 
 $$
-Cov(y_{t - 1}, e_t) = 0
+\begin{aligned}
+E(y_{t}) & = E\left(\frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} e_{t - k}\right) \\
+E(y_{t}) & = E\left(\frac{\delta}{1 - \alpha}\right) + E\left(\sum_{k = 0}^{\infty} \alpha^{k} e_{t - k}\right) \\
+E(y_{t}) & = \frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} E(e_{t - k}) \\
+E(y_{t}) & = \frac{\delta}{1 - \alpha}\\
+\end{aligned}
+$$
+$$
+\begin{aligned}
+Var(y_t) & = E\left((y_{t} - E(y_{t}))^2\right)\\
+Var(y_t) & = E\left((\frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} e_{t - k} - \frac{\delta}{1 - \alpha})^2\right)\\
+Var(y_t) & = E\left(\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)^2\right)\\
+Var(y_t) & = E\left(\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)\right)\\
+\end{aligned}
+Var(y_t) & = E\left(\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)\right)\\
+\end{aligned}
 $$
 
+$$
+Var(y_t) = E\left(
+    \begin{array}{c}
+    e_t\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right) +\\
+    \alpha e_{t - 1}\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right) + \\
+    \alpha^2 e_{t - t}\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)
+    + \\
+    \vdots
+    \end{array}
+  \right)
+$$
+
+$$
+Var(y_t) = E\left(
+    \begin{array}{c}
+    \left( e_{t}^2 + \alpha e_te_{t - 1} + \alpha^2e_te_{t - 2} + \ldots \right) +\\
+    \left( \alpha e_{t}e_{t - 1} + \alpha ^2 e_{t - 1} e_{t - 1} + \alpha^3e_te_{t - 2} + \ldots \right) + \\
+    \alpha^2 e_{t - t}\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)
+    + \\
+    \vdots
+    \end{array}
+  \right)
+$$
+$$
+E(e_t^2) = E((e_t - E(e_t))^2) = E(e_t^2) = \sigma^2
+$$
+Definition of covariance
+$$
+Cov(e_{t}, e_{t - 1}) = E((e_t - E(e_t))(e_{t - 1} - E(e_t)))\\
+ = E(e_te_{t - 1})
+$$
+Properties of the lag operator
+$$
+Ly_{t} = y_{t - 1}\\
+L^2y_{t} = L(Ly_{t}) = L(y_{t - 1}) = y_{t - 2} \\
+L^{k}y_{t} = y_{t - k}\\
+L\delta := \delta, \quad \delta \text{ is a constant} \\
+$$
