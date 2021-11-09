@@ -1,0 +1,268 @@
+---
+title: "ARIMA основи"
+author: "Boyko Amarov"
+date: "11/2/2021"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+AR(1): auto-regressive (авто-регресионен) процес от първи ред
+
+Дефиниция:
+$$
+\underbrace{y_{t}}_{\text{стойност днес}} = \delta + \alpha \underbrace{y_{t - 1}}_{\text{стойност вчера}} + \underbrace{e_{t}}_{\text{бял шум}}, \quad \delta, \alpha \in \mathbb{R}.
+$$
+
+математическо очакване 
+
+$$
+Е(y_t) = ?
+$$
+
+(Математическа) Дисперсия:
+
+
+$$
+Var(y_t) = E\left[\left(y_t - E(y_t)\right)^2\right]
+$$
+Ковариация/корелация (от първи ред)
+
+$$
+Cov(y_t, y_{t - 1}) = E\left[(y_t - E(y_t))(y_{t - 1} - E(y_t))\right]\\
+Cov(y_t, y_{t - 2}) = E\left[(y_t - E(y_t))(y_{t - 2} - E(y_t))\right]\\
+\vdots\\Cov(y_t, y_{t - k}) = E\left[(y_t - E(y_t))(y_{k - 2} - E(y_t))\right]\\
+\rho(y_t, y_{t - 1}) = \frac{Cov(y_t, y_{t - 1})}{Var(y_t)}\\
+\rho(y_t, y_{t - 2}) = \frac{Cov(y_t, y_{t - 2})}{Var(y_t)}\\
+\vdots\\
+\rho(y_t, y_{t - k}) = \frac{Cov(y_t, y_{t - k})}{Var(y_t)}
+$$
+
+## Напълно случаен процес
+
+Казваме, че $e_t$  е напълно случаен процес (бял шум), ако
+
+$$
+E(e_t) = 0, t = 1,\ldots,T\\
+Var(e_t) = \sigma^2, t = 1,\ldots,T\\
+Cov(e_t, e_{t - k}) = 0, k \neq t
+$$
+$$
+e_t \sim WN(\sigma^2)
+$$
+Симулация
+
+```{r}
+## Код за илюстрация
+n <- 100
+
+sim_data <- expand_grid(
+  mu = c(0, 10),
+  sigma = c(1, 3),
+  t = 1:100
+) %>%
+  mutate(
+    y = rnorm(n(), mean = mu, sd = sigma),
+    sigma_lab = paste0("sigma = ", sigma),
+    mu_lab = paste0("mu = ", mu)
+  )
+
+sim_data %>%
+  ggplot(aes(x = t, y = y, color = mu_lab)) +
+  geom_point(size = 1 / 2) +
+  geom_line() +
+  facet_wrap(~sigma_lab) +
+  labs(
+    x = "t",
+    y = expression(y[t])
+  )
+```
+
+```{r}
+sim_data %>%
+  group_by(mu_lab, sigma_lab) %>%
+  summarise(
+    Average = mean(y),
+    StdDev = sd(y)
+  )
+```
+Симулация
+
+$$
+y^{(1)}_{t} = e^{(1)}_t\\
+y^{(2)}_{t} = 2y^{(1)}_{t} + e^{(2)}_t
+$$
+
+```{r}
+n <- 100
+y1 <- rnorm(n = n, mean = 0, sd = 1)
+y2 <- 2 * y1 + rnorm(n = n, mean = 0, sd = 1)
+
+tibble(y1, y2) %>%
+  ggplot(aes(x = y1, y = y2)) +
+    geom_point()
+
+cov(y1, y2)
+cor(y1, y2)
+```
+
+## Статистически своиства на AR(1)
+
+
+$$
+y_{t} = 2 + 0.5 y_{t - 1} + e_t
+$$
+
+Математическото очакване е линеен оператор
+
+$$
+\begin{aligned}
+E(y_{t}) & = Е(2 + 0.5 y_{t - 1} + e_t)\\
+         & = E(2) + E(0.5 y_{t - 1}) + \underbrace{E(e_t)}_{= 0 \text{ свойство на сл. пр.}} \text{ линейност}\\
+         & = 2 + 0.5 E(y_{t - 1}) + 0\\
+E(y_{t}) & = 2 + 0.5 E(y_{t - 1})
+\end{aligned}
+$$
+Ако допуснем, че за всяко $t$ важи:
+
+$$
+E(y_t) = E(y_{t - 1}) = \mu
+$$
+Това допускане означава, че процесът $y_t$ е mean stationary (има стационарена средна стойност).
+
+
+$$
+\begin{aligned}
+E(y_{t}) & = 2 + 0.5 E(y_{t - 1}) \\
+        \mu & = 2 + 0.5\mu \implies \\
+        (1 - 0.5)\mu & = 2\\
+        \mu & =  \frac{2}{1 - 0.5} = 4
+\end{aligned}
+$$
+$$
+y_t = \delta + \alpha y_{t - 1} + e_t\quad e_t \sim WN(\sigma^2)
+$$
+$$
+Ly_t = y_{t - 1}
+$$
+$$
+\begin{aligned}
+  y_t & = \delta + \alpha Ly_{t} + e_t\\
+  y_t - \alpha Ly_{t} & = \delta + e_t\\
+  (1 - \alpha L)y_t & = \delta + e_t\\
+  y_{t} = \frac{\delta}{1 - \alpha L} + \frac{e_t}{1 - \alpha L}
+\end{aligned}
+$$
+$$
+\frac{1}{1 - \alpha}
+$$
+
+$$
+S_n = 1 + \alpha + \alpha^2 + \alpha^3 + \alpha^4 + \alpha^5 + \ldots + \alpha^n\\
+\alpha S_{n} = \alpha(1 + \alpha + \alpha^2 + \alpha^3 + \alpha^4 + \alpha^5 + \ldots + \alpha^n)\\
+\alpha S_{n} = \alpha + \alpha^2 + \alpha^3 + \alpha^4 + \alpha^5 + \alpha^6 + \ldots + \alpha^n +  \alpha^{n + 1}\\
+S_n - \alpha S_n = 1 - \alpha^{n + 1} \\
+(1 - \alpha) S_n = 1 - \alpha^{n + 1} \\
+S_n = \frac{1 - \alpha^{n + 1}}{1 - \alpha}
+$$
+
+$$
+\alpha > 1, \lim_{n \to \infty} \alpha^{n + 1} = \infty\\
+\alpha < -1, \lim_{n \to \infty} \alpha^{n + 1} = ???\\
+-1 < \alpha < 1, \lim_{n \to \infty} \alpha^{n + 1} = 0\\
+$$
+
+$$
+|\alpha| < 1 \implies \\
+\lim_{n \to \infty }S_n = \lim_{n \to \infty }\frac{1 - \alpha^{n + 1}}{1 - \alpha} = \frac{1}{1 - \alpha}
+$$
+
+```{r}
+## За alpha = 0.5
+options(scipen=999)
+(-0.5)^c(1:50)
+```
+
+
+```{r}
+## За alpha = 0.5
+options(scipen=999)
+(0.5)^c(1:50)
+```
+
+```{r}
+## За alpha = -2
+(-2)^c(1:20)
+```
+
+$$
+|\alpha| < 1\\
+\frac{1}{1 - \alpha L} = (1 + \alpha L + \alpha^2 L^2 + \alpha^3L^3 + \ldots)
+$$
+
+$$
+  y_{t} = \frac{\delta}{1 - \alpha L} + \frac{e_t}{1 - \alpha L}\\
+  y_{t} = \delta(1 + \alpha L + \alpha^2 L^2 + \ldots) + e_t(1 + \alpha L + \alpha^2 L^2 + \ldots) \\
+  y_{t} = (\delta + \alpha \delta + \alpha^2 \delta + \ldots) + e_t(1 + \alpha L + \alpha^2 L^2 + \ldots) \\
+  y_{t} = \delta(1 + \alpha + \alpha^2 + \alpha^3 + \alpha^3 + \ldots) + e_t(1 + \alpha L + \alpha^2 L^2 + \ldots) \\
+  y_{t} = \delta \frac{1}{1 - \alpha} + e_t(1 + \alpha L + \alpha^2 L^2 + \ldots) \\
+  y_{t} = \delta \frac{1}{1 - \alpha} + (e_t + \alpha Le_t + \alpha^2 L^2e_t + \ldots)\\
+  y_{t} = \delta \frac{1}{1 - \alpha} + (e_t + \alpha e_{t - 1} + \alpha^2 e_{t - 2} + \alpha^3 e_{t - 3}  + \ldots)\\
+$$
+$$
+y_{t} = \delta \frac{1}{1 - \alpha} + (1e_t + \alpha e_{t - 1} + \alpha^2 e_{t - 2} + \alpha^3 e_{t - 3}  + \ldots)\\
+  y_{t} = \frac{\delta}{1 - \alpha} + \sum_{j = 0}^{\infty}\alpha^{j} e_{t - j}
+$$
+
+$$
+Ly_{t} = y_{t - 1}\\
+L^2y_{t} = L(Ly_{t}) = Ly_{t - 1} = y_{t - 2}\\
+L\delta = \delta\\
+L^2\delta = \delta\\
+\delta_1 = 1, \delta_2 = 1,\ldots, \delta_{t - 1} = 1,  \delta_t = 1
+$$
+
+
+$$
+\begin{aligned}
+  E(y_{t}) & = \frac{\delta}{1 - \alpha}\\
+  E(y_{t}) & = E\left(\frac{\delta}{1 - \alpha} + \sum_{j = 0}^{\infty}\alpha^{j} e_{t - j}\right)\\
+           & = E\left(\frac{\delta}{1 - \alpha}\right) + E\left(\sum_{j = 0}^{\infty}\alpha^{j} e_{t - j}\right) \\
+           & = \frac{\delta}{1 - \alpha} + \sum_{j = 0}^{\infty}E(\alpha^{j} e_{t - j}) \\
+           & = \frac{\delta}{1 - \alpha} + \sum_{j = 0}^{\infty}\alpha^{j} \underset{=0}{E( e_{t - j})} \\
+  E(y_{t}) & = \frac{\delta}{1 - \alpha} \\
+\end{aligned}
+$$
+Пример с $\alpha = 0.5, \delta = 2$:
+
+$$
+E(y_{t}) = \frac{2}{1 - 0.5} = 4
+$$
+$$
+\begin{aligned}
+  Var(y_t) & = E\left((y_t - E(y_t))^2\right)\\
+  & = E\left(\left(
+  \frac{\delta}{1 - \alpha} + \sum_{j = 0}^{\infty}\alpha^{j} e_{t - j} -
+  \frac{\delta}{1 - \alpha}\right)^2\right)\\
+  & = E\left(\left(
+  \sum_{j = 0}^{\infty}\alpha^{j} e_{t - j}
+  \right)^2\right)\\
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+  Var(y_t) & = E\left(
+  (1e_t + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots)(1e_t + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots)\right)\\
+  & = E\left(
+    \begin{array}{c}
+    e_t^2 + \alpha e_{t}e_{t - 1} + \alpha^2e_{t}e_{t - 2} + \ldots +\\
+    \alpha e_{t}e_{t - 1} \alpha^2 e_{t - 1}^2 + \alpha^3e_{t - 1}e_{t - 2} \ldots + \\
+    \alpha ^2 e_{t}e_{t - 2} \alpha^2 e_{t - 1}^2 + \alpha^3e_{t - 1}e_{t - 2} \ldots +
+    \end{array}
+  \right)
+\end{aligned}
+$$
