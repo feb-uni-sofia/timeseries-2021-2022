@@ -13,7 +13,10 @@ $$
 y_1, y_2,\ldots,y_{T}
 $$
 
-AR(1)
+## AR(1)
+
+In the following we will derive 
+
 $$
 y_{t} = \delta + \alpha y_{t - 1} + e_t
 $$
@@ -128,7 +131,7 @@ Autoregressive, because the model equation contains lags of the time
 series $y_{t-1}, y_{t - 2}, \ldots, y_{t - k}$.
 
 $$
-y_{t} = 2 + 0.5y_{t - 1} + e_{t}
+y_{t} = 2 + 0.5y_{t - 1} + e_{t}, \quad e_t \sim WN(\sigma^2)
 $$
 
 $e_t$ is a purely random process (white noise process).
@@ -148,135 +151,259 @@ y_{t} = 2 + 0.5y_{t - 1} + e_{t}, \quad e_{t} \sim WN(\sigma^2)
 $$
 
 $$
-\begin{aligned}
-  E(y_t) & = E(2 + 0.5y_{t - 1} + e_{t}) \text{ because of linearity}\\
-         & = E(2) + E(0.5y_{t - 1}) + E(e_t) \\
-         & = 2 + 0.5 E(y_{t - 1}) + 0 \\
-  E(y_t) & = 2 + 0.5 E(y_{t - 1})\\
-\end{aligned}
+S_{n} = 1 + \beta + \beta^2 + \beta^3 + \ldots + \beta^n\\
+\lim_{n \to \infty } S_{n} = \frac{1}{1 - \beta} \text{ for } |\beta| < 1
 $$
-Let us assume that the expected value of the process does not change over
-time (does not depend on the time index $t$). In other words we assume that
-the process is **mean stationary** (expected value does not change over time).
-
 $$
-E(y_{t}) = E(y_{t - 1}) = \mu
-$$
-Then the equation for the expected values is:
-
-
-$$
-\begin{aligned}
-  \mu & = 2 + 0.5 \mu\\
-  (1 - 0.5) \mu & = 2 \implies\\
-  \mu & = \frac{2}{1 - 0.5} = 4
-\end{aligned}
+\text{ for }\alpha = 2\\
+S_{n} = 1 + 2 + 4 + 8 + \ldots + 2^n\\
+\lim_{n \to \infty } S_{n} = \infty
 $$
 
-
-$$
-y_{t} = \delta + \alpha y_{t - 1} + e_t, \quad e_t \sim WN(\sigma^2)
-$$
-
-$$
-E(y_{t}) = \frac{\delta}{1 - \alpha}
-$$
-New: lag-operator
-$$
-Ly_{t} = y_{t - 1}
-$$
-
-$$
-\begin{aligned}
-y_{t} & = \delta + \alpha y_{t - 1} + e_t\\
-y_{t} & = \delta + \alpha Ly_{t} + e_t\\
-(1 - \alpha L) y_{t} & = \delta + e_t\\
-y_{t} & = \frac{\delta}{1 - \alpha L} + \frac{e_t}{1 - \alpha L}\\
-\end{aligned}
-$$
-$$
-S_{n} = 1 + \alpha + \alpha^2 + \alpha^3 + \ldots + \alpha^n\\
-\lim_{n \to \infty} S_{n} = \frac{1}{1 - \alpha} \text{ for } |\alpha| < 1
-$$
 ```{r}
-n <- 60
-alpha <- 0.5
-sum((alpha)^(0:n))
+1 + cumsum((2)^c(1:20))
 ```
 
-$$
-\text{ For } |\alpha| < 1\\
-\begin{aligned}
-y_{t} & = \frac{\delta}{1 - \alpha L} + \frac{e_t}{1 - \alpha L}\\
-y_{t} & = \delta (1 + \alpha L + \alpha^2L^2 + \ldots) + e_{t}(1 + \alpha L + \alpha^2L^2 + \ldots) \\
-y_{t} & = \delta (1 + \alpha + \alpha^2 + \ldots) + e_{t}(1 + \alpha L + \alpha^2L^2 + \ldots) \\
-y_{t} & = \frac{\delta}{1 - \alpha} + e_{t}(1 + \alpha L + \alpha^2L^2 + \ldots) \\
-y_{t} & = \frac{\delta}{1 - \alpha} + (e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots) \\
-\end{aligned}
-$$
-$$
-\begin{aligned}
-y_{t} & = \frac{\delta}{1 - \alpha} + (\alpha^{0}e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots) \\
-y_{t} & = \frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} e_{t - k} \\
-\end{aligned}
-$$
-
-<!-- \alpha^{k}e_t \text{ for } k = 1 \implies \alpha^{1}e_{t - 1} -->
 
 $$
-\begin{aligned}
-E(y_{t}) & = E\left(\frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} e_{t - k}\right) \\
-E(y_{t}) & = E\left(\frac{\delta}{1 - \alpha}\right) + E\left(\sum_{k = 0}^{\infty} \alpha^{k} e_{t - k}\right) \\
-E(y_{t}) & = \frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} E(e_{t - k}) \\
-E(y_{t}) & = \frac{\delta}{1 - \alpha}\\
-\end{aligned}
+\text{ for }\alpha = 0.5\\
+S_{n} = 0.5 + 0.5^1 + 0.5^2 + 0.5^3  + \ldots + 0.5^n\\
+\lim_{n \to \infty } S_{n} = 2
 $$
+```{r}
+1 + cumsum((0.5)^c(1:30))
+```
+
+Homework: show that the following statement holds
 $$
-\begin{aligned}
-Var(y_t) & = E\left((y_{t} - E(y_{t}))^2\right)\\
-Var(y_t) & = E\left((\frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} e_{t - k} - \frac{\delta}{1 - \alpha})^2\right)\\
-Var(y_t) & = E\left(\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)^2\right)\\
-Var(y_t) & = E\left(\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)\right)\\
-\end{aligned}
-Var(y_t) & = E\left(\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)\right)\\
-\end{aligned}
+-1 < \alpha < 1 \iff |\alpha| < 1\\
+\lim_{n \to \infty } S_{n} = \frac{1}{1 - \alpha}
 $$
 
-$$
-Var(y_t) = E\left(
-    \begin{array}{c}
-    e_t\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right) +\\
-    \alpha e_{t - 1}\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right) + \\
-    \alpha^2 e_{t - t}\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)
-    + \\
-    \vdots
-    \end{array}
-  \right)
-$$
+
+```{r}
+1 + cumsum((-0.5)^c(1:30))
+```
+
 
 $$
-Var(y_t) = E\left(
-    \begin{array}{c}
-    \left( e_{t}^2 + \alpha e_te_{t - 1} + \alpha^2e_te_{t - 2} + \ldots \right) +\\
-    \left( \alpha e_{t}e_{t - 1} + \alpha ^2 e_{t - 1} e_{t - 1} + \alpha^3e_te_{t - 2} + \ldots \right) + \\
-    \alpha^2 e_{t - t}\left( e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots \right)
-    + \\
-    \vdots
-    \end{array}
-  \right)
+|\alpha| < 1\\
+y_{t} = \delta + \alpha y_{t - 1} + e_{t}, \quad e_{t} \sim WN(\sigma^2); \alpha,\delta \in \mathbb{R}
 $$
-$$
-E(e_t^2) = E((e_t - E(e_t))^2) = E(e_t^2) = \sigma^2
-$$
-Definition of covariance
-$$
-Cov(e_{t}, e_{t - 1}) = E((e_t - E(e_t))(e_{t - 1} - E(e_t)))\\
- = E(e_te_{t - 1})
-$$
-Properties of the lag operator
+$\alpha$ and $\delta$ are constants (not random).
+
+Lag operator
 $$
 Ly_{t} = y_{t - 1}\\
-L^2y_{t} = L(Ly_{t}) = L(y_{t - 1}) = y_{t - 2} \\
-L^{k}y_{t} = y_{t - k}\\
-L\delta := \delta, \quad \delta \text{ is a constant} \\
+Ly_{t - 1} = y_{t - 2} \implies L(Ly_{t}) = y_{t - 2} = L^2y_{t}\\
+L^{k} y_{t}  = y_{t - k}\\
+L\delta = \delta
 $$
+We want to express the model equations using only $y_t$ and the lag operator
+
+$$
+\begin{aligned}
+y_{t} & = \delta + \alpha y_{t - 1} + e_{t}\\
+y_{t} & = \delta + \alpha Ly_{t} + e_{t}\\
+y_{t} - \alpha Ly_{t} & = \delta + e_{t}\\
+(1 - \alpha L)y_{t} & = \delta + e_{t}\\
+y_{t} & = \frac{\delta}{1 - \alpha L} + \frac{e_{t}}{1 - \alpha L}\\
+y_{t} & = \delta(1 + \alpha L + \alpha^2L^2 + \ldots) + e_{t}(1 + \alpha L + \alpha^2L^2 + \ldots)\\
+y_{t} & = \frac{\delta}{1 - \alpha} + e_{t}(1 + \alpha L + \alpha^2L^2 + \ldots)\\
+y_{t} & = \frac{\delta}{1 - \alpha} + (e_{t} + \alpha L e_{t} + \alpha^2L^2 e_{t} + \ldots)\\
+y_{t} & = \frac{\delta}{1 - \alpha} + (1e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots)\\
+y_{t} & = \frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} e_{t- k}\\
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+  E(y_{t}) & = E\left(\frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} e_{t- k}\right)\\
+  E(y_{t}) & = E\left(\frac{\delta}{1 - \alpha}\right)+ E\left(\sum_{k = 0}^{\infty} \alpha^{k} e_{t- k}\right)\\
+    E(y_{t}) & = \frac{\delta}{1 - \alpha}+ \sum_{k = 0}^{\infty} \alpha^{k} E\left(e_{t- k}\right)\\
+    E(y_{t}) & = \frac{\delta}{1 - \alpha}+ \sum_{k = 0}^{\infty} \alpha^{k} 0\\
+    E(y_{t}) & = \frac{\delta}{1 - \alpha}+ 0
+\end{aligned}
+$$
+
+
+
+
+Definition of variance:
+$$
+Var(y_{t}) = E(y_{t} - E(y_{t}))^2
+$$
+
+$$
+\begin{aligned}
+Var(y_t) & = E\left(y_{t} - E(y_{t})\right)^2\\
+Var(y_t) & = E\left(\frac{\delta}{1 - \alpha} + \sum_{k = 0}^{\infty} \alpha^{k} e_{t- k} -  \frac{\delta}{1 - \alpha}\right)^2 \\
+Var(y_t) & = E\left(\sum_{k = 0}^{\infty} \alpha^{k} e_{t- k}\right)^2\\
+Var(y_t) & = E\left(e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots\right)^2\\
+Var(y_t) & = E\left((e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots)(e_{t} + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots)\right)\\
+
+\end{aligned}
+$$
+$$
+(x + 1)(y + 2) = xy + 2x + y + 2
+$$
+third line in the sum: homework
+$$
+\begin{aligned}
+  Var(y_t) & = E\left(
+  (e_t + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots)(e_t + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots)\right)\\
+  & = E\left(
+    \begin{array}{c}
+      e_t (e_t + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots) + \\
+      \alpha e_{t - 1}(e_t + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots) + \\
+       \alpha^2e_{t - 2}(e_t + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots) +\\
+       \vdots
+    \end{array}
+  \right)
+\end{aligned}\\
+
+\begin{aligned}
+  & = E\left(
+    \begin{array}{c}
+       e_t^2 + \alpha e_te_{t - 1} + \alpha^2e_te_{t - 2} + \ldots + \\
+       \alpha e_t e_{t - 1} + \alpha^2 e_{t - 1}^2 + \alpha^3e_{t - 1}e_{t - 2} + \ldots + \\
+       \alpha^2e_{t - 2}(e_t + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots) +\\
+       \vdots
+    \end{array}
+  \right)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+  & =
+    \begin{array}{c}
+       Ee_t^2 + \alpha Ee_te_{t - 1} + \alpha^2Ee_te_{t - 2} + \ldots + \\
+       \alpha Ee_t e_{t - 1} + \alpha^2 Ee_{t - 1}^2 + \alpha^3Ee_{t - 1}e_{t - 2} + \ldots + \\
+       E(\alpha^2e_{t - 2}(e_t + \alpha e_{t - 1} + \alpha^2e_{t - 2} + \ldots)) +\\
+       \vdots
+    \end{array}
+\end{aligned}
+$$
+$$
+\begin{aligned}
+Var(y_t) & = Ee_t^2 + \alpha^2Ee_{t - 1}^2 + \alpha^4Ee_{t - 2}^2 + \ldots\\
+Var(y_t) & = \sigma^2 + \alpha^2\sigma^2 + \alpha^4\sigma^2 + \ldots\\
+Var(y_t) & = \sigma^2(1 + \alpha^2 + \alpha^4 + \ldots)
+\end{aligned}
+$$
+$$
+1 + \alpha^2 + \alpha^4 + \ldots\\
+\text{ with } \beta = \alpha^2\\
+1 + \beta + \beta^2 + \ldots = \frac{1}{1 - \beta} = \frac{1}{1 - \alpha^2}\\
+
+$$
+Homework: show that $|\alpha| < 1 \implies |\beta| < 1$.
+
+$$
+Var(y_t) = \frac{\sigma^2}{1 - \alpha^2}
+$$
+
+What is the expected value of the products like $e_t e_{t - 1}$?
+
+Definition of covariance
+$$
+Cov(e_t, e_{t - 1}) = E(e_t)(e_{t - 1})) = E(e_te_{t- 1}) = 0
+$$
+By the definition of the variance:
+$$
+Var(e_t) = E(e_t - E(e_t))^2 = E(e_t^2) = \sigma^2
+$$
+
+## AR(3)
+
+$$
+y_{t} = \delta + \phi_{1}y_{t - 1} + \phi_2 y_{t - 2} + \phi_3 y_{t - 3} + e_t, \quad e_t \sim WN(\sigma^2)
+$$
+Roots of the lag-polynomial: 0.8, 0.2, -0.5. Roots of what?
+
+$$
+Ly_{t} = y_{t - 1}\\
+Ly_{t - 1} = y_{t - 2}\\
+L\cdot Ly_{t} = y_{t - 2}\\
+L^2y_{t} = y_{t - 2}\\
+L^3y_{t} = y_{t - 3}
+$$
+
+Using the lag operator we can express the model as:
+$$
+y_{t} = \delta + \phi_1 Ly_{t} + \phi_2 L^2y_{t} + \phi_3 L^3 y_{t} + e_t\\
+y_{t}(\underbrace{L^0 - \phi_1 L - \phi_2 L^2 - \phi_3 L^3}_{\text{lag polynomial}}) = \delta + e_t
+$$
+Characteristic equation:
+
+$$
+\lambda^{3 - 0} - \phi_1\lambda^{3 - 1} - \phi_2 \lambda^{3 - 2} - \phi_3 \lambda ^ {3 - 3} = 0\\
+\lambda^{3} - \phi_1\lambda^{2} - \phi_2 \lambda - \phi_3 = 0
+$$
+The roots of the characteristic polynomial determine whether the process is stationary
+or not. If the roots of this equation are less than 1 in absolute value then the process
+is stationary.
+
+If we know that the roots of this equation are
+
+$$
+\lambda_1^* = 0.8, \lambda_2^* = 0.2, \lambda_3^* = -0.5
+$$
+$$
+\lambda^{3} - \phi_1\lambda^{2} - \phi_2 \lambda - \phi_3 = (\lambda - \lambda_{1}^*)(\lambda - \lambda_2^*)(\lambda - \lambda_3^*)
+$$
+$$
+(\lambda - \lambda_{1}^*)(\lambda - \lambda_2^*)(\lambda - \lambda_3^*) = \\
+(\lambda - 0.8)(\lambda - 0.2)(\lambda + 0.5) = \\
+\left[\lambda^2 - \lambda + 0.16\right](\lambda + 0.5) = \\
+\lambda^3 - \lambda^2 + 0.16\lambda + 0.5\lambda^2 - 0.5\lambda + 0.08
+$$
+
+$$
+\lambda^{3} - \phi_1\lambda^{2} - \phi_2 \lambda - \phi_3\\
+\lambda^3 -0.5\lambda^2 -0.34\lambda + 0.08
+$$
+
+$$
+\phi_1 = 0.5\\
+\phi_2 = 0.34\\
+\phi_3 = -0.08
+$$
+$$
+y_{t} = \delta + \phi_{1}y_{t - 1} + \phi_2 y_{t - 2} + \phi_3 y_{t - 3} + e_t\\
+y_{t} = \delta + 0.5y_{t - 1} + 0.34y_{t - 2} - 0.08 y_{t - 3} + e_t
+$$
+Now we can calculate
+
+First order autocorrelation:
+$$
+\rho(y_{t}, y_{t - 1}) = \rho_1 = \frac{Cov(y_{t}, y_{t - 1})}{Var(y_{t})}
+$$
+The Yule-Walker equations connect the autocorrelations (and autocovariances) and
+the model coefficients.
+
+$$
+\rho_1 = \phi_1 \rho_0 + \phi_2\rho_1 + \ldots + \phi_R\rho_{R - 1}\\
+\rho_2 = \phi_1 \rho_1 + \phi_2 + \ldots + \phi_R \rho_{R - 2} \\
+\vdots\\
+\rho_{R - 1} = \phi_1 \rho_{R - 1} + \phi_2\rho_{R - 2} + \ldots + \phi_R\rho_0
+$$
+In the case of an AR(3)
+
+$$
+\rho_1 = \phi_1 + \phi_2 \rho_1 + \phi_3 \rho_2\\
+\rho_{2} = \phi_{1}\rho_{2 - 1} + \phi_2 \rho_{2 - 2} + \phi_3\rho_{3 - 2}\\
+$$
+$$
+\rho_1 = \phi_1 + \phi_2 \rho_1 + \phi_3 \rho_2\\
+\rho_{2} = \phi_{1}\rho_{1} + \phi_2 \rho_{0} + \phi_3\rho_{1}\\
+$$
+
+$$
+\rho_1 = 0.5 + 0.34 \rho_1 - 0.08 \rho_2\\
+\rho_2 = 0.5\rho_1 + 0.34 - 0.08\rho_1\\
+$$
+
+
+
