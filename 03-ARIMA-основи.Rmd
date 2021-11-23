@@ -111,10 +111,29 @@ cor(y1, y2)
 
 ## Статистически своиства на AR(1)
 
+$$
+y_{t} = 2 + 0.5 y_{t - 1} + e_t, \quad e_t\sim WN(\sigma^2)
+$$
+Свойства на напълно случайния процес $e_t$:
 
 $$
-y_{t} = 2 + 0.5 y_{t - 1} + e_t
+E(e_t) = 0 \text{ за всяко } t\\
+Var(e_t) = \sigma^2 \text{ за всяко } t\\
+Cov(e_t, e_{t - k}) = 0 \text{ за всяко } t \text{ и за всяко } k \neq 0 \\
 $$
+Дефиниция на дисперсия:
+$$
+Var(e_t) = E[(e_t - E(e_t))^2] = E[e_t^2] = \sigma^2
+$$
+Дефиниция на ковариация:
+$$
+Cov(e_t, e_{t - k}) = E[(e_t - E(e_t))(e_{t - k} - E(e_{t - k}))] = E[e_te_{t - k}] = 0, \quad k \neq 0
+$$
+при $k = 0$
+$$
+Cov(e_t, e_{t}) = E(e_te_t) = E(e_t^2) = \sigma^2
+$$
+
 
 Математическото очакване е линеен оператор
 
@@ -207,7 +226,7 @@ $$
   y_{t} = \frac{\delta}{1 - \alpha L} + \frac{e_t}{1 - \alpha L}\\
   y_{t} = \delta(1 + \alpha L + \alpha^2 L^2 + \ldots) + e_t(1 + \alpha L + \alpha^2 L^2 + \ldots) \\
   y_{t} = (\delta + \alpha \delta + \alpha^2 \delta + \ldots) + e_t(1 + \alpha L + \alpha^2 L^2 + \ldots) \\
-  y_{t} = \delta(1 + \alpha + \alpha^2 + \alpha^3 + \alpha^3 + \ldots) + e_t(1 + \alpha L + \alpha^2 L^2 + \ldots) \\
+  y_{t} = \delta(1 + \alpha + \alpha^2 + \alpha^3 + \alpha^4 + \ldots) + e_t(1 + \alpha L + \alpha^2 L^2 + \ldots) \\
   y_{t} = \delta \frac{1}{1 - \alpha} + e_t(1 + \alpha L + \alpha^2 L^2 + \ldots) \\
   y_{t} = \delta \frac{1}{1 - \alpha} + (e_t + \alpha Le_t + \alpha^2 L^2e_t + \ldots)\\
   y_{t} = \delta \frac{1}{1 - \alpha} + (e_t + \alpha e_{t - 1} + \alpha^2 e_{t - 2} + \alpha^3 e_{t - 3}  + \ldots)\\
@@ -216,7 +235,7 @@ $$
 y_{t} = \delta \frac{1}{1 - \alpha} + (1e_t + \alpha e_{t - 1} + \alpha^2 e_{t - 2} + \alpha^3 e_{t - 3}  + \ldots)\\
   y_{t} = \frac{\delta}{1 - \alpha} + \sum_{j = 0}^{\infty}\alpha^{j} e_{t - j}
 $$
-
+Свойства на лаг оператора
 $$
 Ly_{t} = y_{t - 1}\\
 L^2y_{t} = L(Ly_{t}) = Ly_{t - 1} = y_{t - 2}\\
@@ -260,14 +279,305 @@ $$
   & = E\left(
     \begin{array}{c}
     e_t^2 + \alpha e_{t}e_{t - 1} + \alpha^2e_{t}e_{t - 2} + \ldots +\\
-    \alpha e_{t}e_{t - 1} \alpha^2 e_{t - 1}^2 + \alpha^3e_{t - 1}e_{t - 2} \ldots + \\
-    \alpha ^2 e_{t}e_{t - 2} \alpha^2 e_{t - 1}^2 + \alpha^3e_{t - 1}e_{t - 2} \ldots +
+    \alpha e_{t}e_{t - 1} + \alpha^2 e_{t - 1}^2 + \alpha^3e_{t - 1}e_{t - 2} \ldots + \\
+    \alpha ^2 e_{t}e_{t - 2} + \alpha^3e_{t - 1}e_{t - 2}  + \alpha^4 e_{t - 2}^2 + \ldots +
     \end{array}
   \right)
 \end{aligned}
 $$
 
-
+$$
+\begin{aligned}
+  Var(y_t) & = 
+    \begin{array}{c}
+    Е(e_t^2) + \alphaЕ (e_{t}e_{t - 1}) + \alpha^2Е(e_{t}e_{t - 2}) + \ldots +\\
+    \alpha Е(e_{t}e_{t - 1}) + \alpha^2 Е(e_{t - 1}^2) + \alpha^3Е(e_{t - 1}e_{t - 2}) \ldots + \\
+    \alpha ^2 Еe_{t}e_{t - 2} + \alpha^3Еe_{t - 1}e_{t - 2} + \alpha^4 Еe_{t - 2}^2 +  \ldots +
+    \end{array}
+\end{aligned}
+$$
+$$
+\begin{aligned}
+  Var(y_t) & = 
+    \begin{array}{c}
+    \sigma^2 + \alpha\cdot 0 + \alpha^2\cdot 0 + \ldots +\\
+    \alpha \cdot 0 + \alpha^2 \sigma^2 + \alpha^3\cdot 0 \ldots + \\
+    \alpha ^2\cdot 0 + \alpha^3\cdot 0 + \alpha^4 \sigma^2 +  \ldots +
+    \end{array}
+\end{aligned}
 $$
 
+$$
+(1 + \beta + \beta^2 + \beta^3 + \beta^4 + \ldots ) = \frac{1}{1 - \beta},\quad |\beta| < 1
+$$
+$$
+\beta = \alpha^2
+$$
+
+$$
+Var(y_t) = \sigma^2 + \alpha^2 \sigma^2 + \alpha^4\sigma^2 + \ldots\\
+Var(y_t) = \sigma^2(1+ \alpha^2  + \alpha^4 + \ldots)\\
+Var(y_t) = \sigma^2(1+ \beta + \beta^2 + \ldots)\\
+Var(y_t) = \frac{\sigma^2}{1 - \beta} = \frac{\sigma^2}{1 - \alpha^2}\\
+$$
+
+в крайна сметка получаваме, че:
+
+$$
+Var(y_t) = \frac{\sigma^2}{1 - \alpha^2}\\
+$$
+
+$$
+Cov(y_{t}, y_{t - 1}) = E((y_t - E(y_t))(y_{t - 1} - E(y_{t - 1})))\\
+= E
+\left[
+  \left(
+    \sum_{j = 0}^{\infty}\alpha^{j} e_{t - j}
+  \right)
+  \left(
+    \sum_{j = 0}^{\infty}\alpha^{j} e_{t - j - 1}
+  \right)
+\right] = \\
+E\left(
+  \left(
+    e_t + \alpha e_{t - 1} + \alpha^2 e_{t - 2} + \ldots
+  \right)
+  \left(
+    e_{t - 1} + \alpha e_{t - 2} + \alpha^2 e_{t - 3} + \ldots
+  \right)
+\right)
+$$
+$$
+E\left(
+  \left(
+    e_t + \alpha e_{t - 1} + \alpha^2 e_{t - 2} + \ldots
+  \right)
+  \left(
+    e_{t - 1} + \alpha e_{t - 2} + \alpha^2 e_{t - 3} + \ldots
+  \right)
+\right) = \\
+E\left[
+  \left(
+    e_t(e_{t - 1} + \alpha e_{t - 2} + \alpha^2 e_{t - 3} + \ldots)
+  \right)
+  +\\
+  (\alpha e_{t - 1} + \alpha^2 e_{t - 2} + \ldots)
+  \left(
+    e_{t - 1} + \alpha e_{t - 2} + \alpha^2 e_{t - 3} + \ldots
+  \right)
+\right] = \\
+E\left[
+  (\alpha e_{t - 1} + \alpha^2 e_{t - 2} + \ldots)
+  \left(
+    e_{t - 1} + \alpha e_{t - 2} + \alpha^2 e_{t - 3} + \ldots
+  \right)
+\right] = \\
+\alpha E\left[
+  ( e_{t - 1} + \alpha e_{t - 2} + \alpha^2 e_{t - 3} \ldots)
+  \left(
+    e_{t - 1} + \alpha e_{t - 2} + \alpha^2 e_{t - 3} + \ldots
+  \right)
+\right] = \\
+\alpha E\left[
+  ( e_{t - 1} + \alpha e_{t - 2} + \alpha^2 e_{t - 3} \ldots)^2
+\right] = \\
+
+\alpha Var(y_{t  -1}) = \\
+Cov(y_{t}, y_{t - 1}) = \alpha \frac{\sigma^2}{1 - \alpha^2}
+
+$$
+$$
+\rho(y_{t}, y_{t - 1}) = \frac{Cov(y_t, y_{t - 1})}{Var(y_t)}
+$$
+
+$$
+\rho = \frac{\alpha\frac{\sigma^2}{1 - \alpha^2}}{\frac{\sigma^2}{1 - \alpha^2}} = \alpha
+$$
+За домашно покажете, че
+
+$$
+Cov(y_{t}, y_{t - 2}) = \alpha^2\frac{\sigma^2}{1 - \alpha^2}\\
+\rho(y_t, y_{t - 2}) = \alpha^2
+$$
+
+$$
+k \neq 0\\
+Cov(y_{t}, y_{t - k}) = \alpha^k\frac{\sigma^2}{1 - \alpha^2}\\
+\rho(y_t, y_{t - k}) = \alpha^k
+$$
+## Задача от лекциите
+
+AR(1)
+
+Без ограничение на общовалидността $\delta = 0$.
+
+$$
+y_t = \phi_{1}y_{t - 1} + e_t,  \quad e_t\sim WN(\sigma^2)
+$$
+
+$$
+(1 - \phi_1 B)y_{t} = e_{t}
+$$
+$$
+1 - \phi_1 B = 0\\
+\phi_1 B = 1\\
+B = \frac{1}{\phi_1}
+$$
+
+$$
+1B^{0} - \phi_1 B^1
+$$
+
+Характеристично уравнение
+$$
+\lambda^{1 - 0} - \phi_1 \lambda^{1 - 1} = 0\\
+\lambda - \phi_1 = 0
+$$
+
+$$
+\lambda^* = \phi_1
+$$
+
+$$
+\phi_1 = 1
+$$
+
+Random walk (случайно лутане)
+$$
+y_{t} = y_{t - 1} + e_t\\
+$$
+$$
+y_t = y_{t - 4} + e_{t - 3} + e_{t - 2} + e_{t- 1} + e_t\\
+$$
+$$
+y_{t} = \sum_{k = 1}^{t}e_{k}
+$$
+
+Тъй като $Cov(e_t, e_{t - k}) = 0$
+
+$$
+Cov(e_t, e_{t - k}) = 0, k\neq 0\\
+Var(y_{t}) = Var\left(\sum_{k = 0}^{t}e_{k}\right) = \sum_{k = 0}^{t}Var(e_{k})\\
+Var(y_{t}) = \sum_{k = 1}^{t}\sigma^2 = (\sigma^2 + \sigma^2 + \ldots + \sigma^2)\\
+Var(y_{t}) = t\sigma^2
+$$
+AR(1)
+
+$$
+y_{t} = \phi_1 y_{t - 1} + e_t, |\phi_1| < 1\\
+Var(y_{t}) = \frac{\sigma^2}{1 - \phi_1^2}
+$$
+
+```{r}
+ar1_stationary <- arima.sim(n = 100, model = list(ar = c(0.5)))
+plot(ar1_stationary)
+```
+
+```{r}
+e <- rnorm(n = 100)
+rw <- cumsum(e)
+plot(rw, type = "n")
+lines(1:100, rw)
+```
+AR(2)
+
+$$
+y_{t} = \phi_1y_{t - 1} + \phi_2 y_{t - 2} + e_t\\
+y_{t}(B^{0} - \phi_1 B^{1} - \phi_2 B^2 ) = e_{t}
+$$
+Характеристично уравнение
+
+
+$$
+\lambda^{2 - 0} - \phi_1 \lambda^{2 - 1} - \phi_2 \lambda^{2 - 2} = 0\\
+\lambda^{2} - \phi_1 \lambda - \phi_2 = 0
+$$
+Пример
+$$
+y_{t} = 0.5y_{t - 1} + 0.2y_{t- 1} + e_t
+$$
+
+$$
+\lambda^{2} - 0.5 \lambda - 0.2 = 0
+$$
+```{r}
+roots <- polyroot(c(-0.2, -0.5, 1))
+roots
+```
+
+```{r}
+abs(roots)
+```
+
+
+Решенията на уравнението са:
+$$
+\lambda_1^* = -0.26\\
+\lambda_2^* = 0.76\\
+$$
+$$
+(\lambda - \lambda_1^*)(\lambda - \lambda_2^*) = 0
+$$
+Ако са ни дадени корените на характеристичното уравнение можем
+да стигнем до коефициентите на процеса $ph_1, phi_2$.
+
+$$
+(\lambda + 0.26)(\lambda - 0.76) = \\
+\lambda^2 - 0.76\lambda + 0.26\lambda - 0.1976 = \\
+\lambda^2 - 0.5\lambda - 0.1976 \\
+\lambda^{2} - \phi_1 \lambda - \phi_2 = 0
+$$
+
+$$
+\phi_1 = 0.5 \\
+\phi_2 = 0.1976
+$$
+
+$$
+\rho_1 = ???
+$$
+
+Yule-Walker за AR(2) процес.
+
+$$
+\rho_1 = \phi_1 \rho_0 + \phi_2 \rho_1\implies\\
+(1 - \phi_2)\rho_1 = \phi_1\rho_0 =\\
+\rho_1 = \frac{\phi_1}{1 - \phi_2}
+$$
+
+
+В примера с:
+
+$$
+\phi_1 = 0.5\\
+\phi_2 = 0.2\\
+\rho_1 = \frac{0.5}{1 - 0.2} = ???
+$$
+
+$$
+\rho_0 = Cor(y_{t}, y_{t}) = 1
+$$
+$$
+\rho_2 = ?
+$$
+$$
+\rho_1 = \phi_1 \rho_0 + \phi_2 \rho_1
+$$
+$$
+\rho_2 = \phi_1 \rho_{1} + \phi_2\rho_{0}
+$$
+
+$$
+\rho_2 = \phi_1 \rho_{1} + \phi_2\\
+\rho_2 = \phi_1 \frac{\phi_1}{1 - \phi_2} + \phi_2\\
+\rho_2 = 0.5 \frac{0.5}{1 - 0.2} + 0.2 = ???\\
+$$
+
+
+
+
+
+
+$$
+y_t = \phi_{1}y_{t - 1} + \phi_2y_{t - 2} + \underbrace{\phi_3}_{ = 0}y_{t- 3} + e_t,  \quad e_t\sim WN(\sigma^2)
 $$
