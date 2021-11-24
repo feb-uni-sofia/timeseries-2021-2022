@@ -404,6 +404,144 @@ $$
 \rho_1 = 0.5 + 0.34 \rho_1 - 0.08 \rho_2\\
 \rho_2 = 0.5\rho_1 + 0.34 - 0.08\rho_1\\
 $$
+## Stationarity of AR(p)
+
+AR(1)
+$$
+\text{with }\delta = 0\\
+y_{t} = \phi_1 y_{t - 1} + e_t, \quad e_t \sim WN(\sigma^2)
+$$
+
+when is this process stationary? What does it mean for a process to be stationary?
+
+Stationarity:
+
+- Mean stationarity: the expected value of the process does not depend on the time index $t$
+- Variance stationarity: the variance of the process does not change over time
+- Covariance stationarity: the autocovariances of the process do not change over time
+
+
+```{r}
+x <- arima.sim(n = 100, model = list(ar = c(0.5)))
+plot(x, main = "Time series without a trend")
+```
+
+
+```{r}
+plot(x + 0.2 * (1:100), main = "Time series with a linear trend")
+```
+
+$$
+E(y_t) = 0.2t
+$$
+
+## Example of a non-stationary process
+
+Random walk process
+$$
+y_{t} = y_{t - 1} + e_t, e_t \sim WN(\sigma^2)
+$$
+
+$$
+Var(y_t)= ?
+$$
+$$
+y_{t} = y_{t - 3} + e_{t - 2} + e_{t - 1} + e_t\\
+\vdots\\
+y_{t} = \sum_{k = 1}^{t}e_t
+$$
+
+$$
+E(y_t) = E(\sum_{k = 1}^{t}e_t) = \sum_{k = 1}^{t}E(e_t) = 0
+$$
+
+$$
+Var(y_{t}) = Var(\sum_{k = 1}^{t}e_t) = \sum_{k = 1}^{t}Var(e_t) = \sum_{k = 1}^{t}\sigma^2\\
+Var(y_{t}) = \sigma^2 + \sigma^2 + \ldots + \sigma^2 = t\sigma^2
+$$
+
+The variance of a AR(1):
+
+$$
+y_{t} = \phi_1y_{t - 1} + e_t \\
+Var(y_t) = \frac{\sigma^2}{1 - \phi_1^2}
+$$
+
+For autoregressive processes of first order the stationarity condition is that
+
+$$
+|\phi_1| < 1
+$$
+
+When is an AR(2) process stationary?
+
+$$
+y_{t} = \phi_1y_{t - 1} + \phi_2 y_{t - 2} + e_t \\
+$$
+Characteristic equation of the process
+
+$$
+y_{t} = \phi_1Ly_{t} + \phi_2 L^2y_{t} + e_t \\
+(1 - \phi_1L - \phi_2 L^2)y_{t} = e_t
+$$
+Lag polynomial of the process
+$$
+L^{0} - \phi_1L^{1} - \phi_2 L^2
+$$
+Characteristic equation:
+$$
+\lambda^{2 - 0} - \phi_1 \lambda^{2 - 1} - \phi_2 \lambda^{2 - 2} = 0\\
+\lambda^{2} - \phi_1 \lambda - \phi_2 = 0\\
+$$
+
+Whether the process is stationary or not depends on the roots of this equation.
+Example:
+$$
+\phi_1 = 0.5, \phi_2 = 0.2
+$$
+
+$$
+\lambda^{2} - 0.5 \lambda - 0.2 = 0
+$$
+
+How do we solve this equation?
+
+```{r}
+## Pass it a vector of coefficients
+roots <- polyroot(c(-0.2, -0.5, 1))
+roots
+```
+
+```{r}
+abs(roots)
+```
+
+The output is in the notation of complex numbers. If the roots of the 
+characteristic equation are less than one in absolute value, then
+the process is stationary.
+
+## MA(1)
+
+$$
+y_{t} = e_t + \theta_1 e_{t - 1}, \theta_1 \text{ is a constant}, e_t \sim WN(\sigma^2)\\
+$$
+$$
+E(y_t) = \underbrace{E(e_t)}_{= 0} + \theta_1 \underbrace{E(e_{t - 1})}_{=0} = 0
+$$
+$$
+Var(y_{t}) = Var(e_{t} + \theta_1 e_{t - 1}) =  \\
+Var(y_{t}) = Var(e_{t}) + Var(\theta_1 e_{t - 1}) = \sigma^2 +  \theta_1^2 \sigma^2\\
+Var(y_{t}) = \sigma^2(1 + \theta_1^2)
+$$
+Can we write this variance as a sum of variances? Yes, because $e_t$ and $e_{t - 1}$
+are uncorrelated.
+
+$$
+Cov(e_t, e_{t - k}) = 0, k \neq 0
+$$
+
+Homework: can you uniquely determine $\theta_1$ if you know the variance of $y_t$
+and $\sigma^2$.
 
 
 
