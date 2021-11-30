@@ -5,12 +5,14 @@ date: "11/2/2021"
 output: html_document
 ---
 
+
 ```{r}
 library(tidyverse)
 ```
 
 
 AR(1): auto-regressive (авто-регресионен) процес от първи ред
+
 
 Дефиниция:
 $$
@@ -572,12 +574,127 @@ $$
 \rho_2 = \phi_1 \frac{\phi_1}{1 - \phi_2} + \phi_2\\
 \rho_2 = 0.5 \frac{0.5}{1 - 0.2} + 0.2 = ???\\
 $$
-
-
-
-
-
-
 $$
 y_t = \phi_{1}y_{t - 1} + \phi_2y_{t - 2} + \underbrace{\phi_3}_{ = 0}y_{t- 3} + e_t,  \quad e_t\sim WN(\sigma^2)
 $$
+## Moving average: MA(q)
+
+
+$$
+e_{t} \sim WN(\sigma^2)\\
+y_{t} = e_{t} + \theta_1 e_{t - 1} \text{ MA(1)}\\
+y_{t} = e_{t} + \theta_1 e_{t - 1} + \theta_2 e_{t - 2} \text{ MA(2)}\\
+y_{t} = e_{t} + \theta_1 e_{t - 1} + \theta_2 e_{t - 2} + \ldots +\theta_q e_{t - q} \text{ MA(q)}\\
+$$
+
+
+$$
+\text{за всяко } t\\
+E(e_t) = 0\\
+Var(e_t) = E(e_t^2) = \sigma^2\\
+Var(e_{t - 1}) = E(e_{t - 1}^2) = \sigma^2\\
+Cov(e_t, e_{t - k}) = E(e_t e_{t - k}) = 0, k \neq 0
+$$
+
+
+Пример МА(1)
+$$
+y_{t} = e_t + 0.5e_{t - 1}
+$$
+
+$$
+E(y_t)= E(e_t) + 0.5E(e_{t - 1}) = 0 + 0.5\cdot 0 = 0\\
+$$
+$$
+Var(y_t) = E[(y_t - E(y_t))^2] = E[(e_t + 0.5e_{t - 1})^2]\\
+Var(y_t) = E[e_t^2 + 2\cdot 0.5 e_t e_{t - 1} + 0.5^2e_{t - 1}^2] = \\
+= E[e_t^2] + E[2\cdot 0.5 e_t e_{t - 1}]+ E[0.5^2e_{t - 1}^2] = \\
+= \sigma^2 + 0+ 0.5^2\sigma^2 = \\
+= \sigma^2 + 0.5^2\sigma^2 = \\
+= \sigma^2(1  + 0.5^2)
+$$
+
+$$
+Var(y_{t}) = \sigma^2(1  + \theta_1^2)
+$$
+
+$$
+Cov(y_{t}, y_{t - 1}) = E[(y_{t} - E(y_{t}))(y_{t - 1} - E(y_{t - 1}))]\\
+Cov(y_{t}, y_{t - 1}) = E[y_{t}y_{t - 1}]\\
+= E[(e_t + 0.5e_{t - 1})(e_{t - 1} + 0.5e_{t - 2})] = \\
+= E[e_te_{t-1} + 0.5e_{t}e_{t - 2} + 0.5 e_{t - 1}^2 + 0.5^2e_{t- 1}e_{t - 2}]\\
+= E[e_te_{t-1}] + 0.5E[e_{t}e_{t - 2}] + 0.5E[e_{t - 1}^2] + 0.5^2E[e_{t- 1}e_{t - 2}] = \\
+= 0 + 0.5\cdot 0 + 0.5\sigma^2 + 0.5^2 \cdot 0 = \\
+= 0.5\sigma^2 \\
+$$
+
+$$
+Cov(y_{t}, y_{t - 1}) = \theta_1 \sigma^2
+$$
+
+$$
+\rho(y_{t}, y_{t - 1}) = \frac{Cov(y_{t}, y_{t - 1})}{Var(y)} = \frac{\theta_1 \sigma^2}{\sigma^2(1  + \theta_1^2)} = \frac{\theta_1}{1 + \theta_1^2}
+$$
+
+
+$$
+y_{t} = e_t + \theta_1 e_{t - 1} = e_t + \theta_1 L e_{t} = \\
+y_{t} = e_{t}(1 + \theta_1 L)\\
+\frac{y_{t}}{1 + \theta_1 L} = e_{t}\\
+\sum_{k = 1}^{\infty} \theta_1^{k} y_{t - k} = e_t
+$$
+
+$$
+y_{t} = \phi_1 y_{t - 1} + e_t\\
+y_{t} = \frac{e_{t}}{1 - \phi_1 L} = \sum_{k = 1}^{\infty}\phi_1^{k} e_{t - k}
+$$
+
+MA(3)
+$$
+y_{t} = e_t + \theta_1 e_{t - 1} + \theta_2 e_{t - 2} + \theta_3 e_{t - 3}\\
+E(y_{t}) = 0\\
+Var(y_{t}) = Var(e_t) + \theta_1^2 Var(e_{t - 1}) + \theta_2^2 Var(e_{t - 2}) + \theta_3^2Var(e_{t - 3}) = \\
+Var(y_{t}) = \sigma^2 + \theta_1^2 \sigma^2 + \theta_2^2\sigma^2 + \theta_3^2 \sigma^2 = \\
+Var(y_{t}) = \sigma^2(1 + \theta_1^2 + \theta_2^2 + \theta_3^2)
+$$
+$$
+Cov(y_{t}, y_{t - 1}) = E(y_{t}y_{t - 1}) = \\
+E[(e_t + \theta_1 e_{t - 1} + \theta_2 e_{t - 2} + \theta_3 e_{t - 3})(e_{t - 1} + \theta_1 e_{t - 2} + \theta_2 e_{t - 3} + \theta_3 e_{t - 4})] = \\
+E[\theta_1e_{t - 1}^2 + \theta_2\theta_1e_{t - 2}^2 \theta_3\theta_2e_{t - 3}^2]= \\
+\theta_1\sigma^2 + \theta_2\theta_1 \sigma^2 + \theta_3\theta_2\sigma^2 = 
+\sigma^2 (\theta_1 + \theta_2\theta_1 + \theta_3\theta_2) = 
+$$
+
+$$
+Cov(y_{t}, y_{t - 2}) = E(y_{t}y_{t - 2}) = \\
+E[(e_t + \theta_1 e_{t - 1} + \theta_2 e_{t - 2} + \theta_3 e_{t - 3})(e_{t - 2} + \theta_1 e_{t - 3} + \theta_2 e_{t - 4} + \theta_3 e_{t - 5})] =\\
+E[\theta_2 e_{t - 2}^2 + \theta_3 \theta_1 e_{t - 3}^2] = 
+\sigma^2(\theta_2 + \theta_3\theta_1)
+$$
+$$
+Cov(y_{t}, y_{t - 4}) = E(y_{t}y_{t - 4}) = \\
+E[(e_t + \theta_1 e_{t - 1} + \theta_2 e_{t - 2} + \theta_3 e_{t - 3})(e_{t - 4} + \theta_1 e_{t - 5} + \theta_2 e_{t - 6} + \theta_3 e_{t - 7})] = 0
+$$
+
+```{r}
+x_ma_3 <- arima.sim(n = 100, model = list(ma = c(0.5, 0.2, 0.2)))
+```
+
+
+
+```{r}
+plot(x_ma_3)
+```
+
+```{r}
+acf(x_ma_3)
+```
+
+```{r}
+x_ar_1 <- arima.sim(n = 100, model = list(ar = c(0.7)))
+plot(x_ar_1)
+```
+```{r}
+acf(x_ar_1)
+```
+
