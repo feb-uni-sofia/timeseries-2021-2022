@@ -1,0 +1,123 @@
+---
+title: "Untitled"
+author: "Boyko Amarov"
+date: "12/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Симулация на AR(1) процес
+
+$$
+y_{t} = 0.8 y_{t - 1} + e_t, e_t \sim WN(1)
+$$
+Теоретични автокорелации на модела
+```{r}
+0.8^2 # alpha^2
+0.8^3 # alpha^3
+0.8^4 # alpha^4
+0.8^80
+```
+
+```{r}
+set.seed(222)
+ar1_sim <- arima.sim(model = list(ar = c(0.8)), n = 200)
+# ?arima.sim
+plot(ar1_sim)
+```
+
+```{r}
+mean(ar1_sim)
+```
+
+Ако трябва да изберем между AR или МА процес, за да опише данните, как да направим
+избор?
+
+Функция на автокорелация (ACF):
+
+
+$$
+k = 0: \widehat{\rho}(y_{t}, y_{t}) = 1\\
+k = 1: \widehat{\rho}(y_{t}, y_{t - 1})\\
+k = 2: \widehat{\rho}(y_{t}, y_{t - 2})\\
+$$
+```{r}
+acf(ar1_sim, plot = FALSE)
+acf(ar1_sim, lag.max = 20)
+?acf
+```
+## Симулация AR(1) с отрицателен коефициент
+
+$$
+y_{t} = -0.8y_{t - 1} + e_t, e_t \sim WN(1)
+$$
+```{r}
+set.seed(222)
+ar1_sim_neg <- arima.sim(model = list(ar = c(-0.8)), n = 200)
+# ?arima.sim
+acf(ar1_sim_neg)
+pacf(ar1_sim_neg)
+```
+
+Частична автокорелационна функция
+
+```{r}
+pacf(ar1_sim)
+pacf(ar2_sim)
+```
+
+Разлика между автокорелация и частична автокорелация
+
+
+
+Сини прекъснати линии: 95% доверителен интервал
+
+## Симулация от AR(2) процес
+
+$$
+y_{t} = 0.6y_{t - 1} + 0.2 y_{t - 2} + e_t, e_t \sim WN(1)\\
+y_{t-1} = 0.6y_{t - 2} + 0.2 y_{t - 3} + e_{t - 1}\\
+y_{t-2} = 0.6y_{t - 3} + 0.2 y_{t - 4} + e_{t - 2}\\
+$$
+
+```{r}
+ar2_sim <- arima.sim(model = list(ar = c(0.6, 0.2)), n = 200)
+acf(ar2_sim)
+```
+
+
+
+## Симулация на бял шум
+
+$$
+y_{t} = e_{t}
+$$
+
+```{r}
+wn_sim <- arima.sim(n = 400, model = list())
+plot(wn_sim)
+acf(wn_sim, max.lag = 100)
+```
+
+
+```{r}
+# ar1_sim_l1 <- stats::lag(ar1_sim)
+# ar1_sim_all_lags <- cbind(ar1_sim, ar1_sim_l1)
+```
+
+
+## Симулация от MA(1)
+
+$$
+y_{t} = e_t + 0.95 e_{t - 1}, e_t \sim WN(1)
+$$
+
+```{r}
+ma1_sim <- arima.sim(n = 200, model = list(ma = c(-0.95)))
+acf(ma1_sim)
+pacf(ma1_sim)
+```
+
