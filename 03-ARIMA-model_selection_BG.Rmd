@@ -121,3 +121,204 @@ acf(ma1_sim)
 pacf(ma1_sim)
 ```
 
+```{r}
+set.seed(543)
+series1 <- arima.sim(model = list(), n = 400)
+series2 <- arima.sim(model = list(ar = c(0.9)), n = 400)
+series3 <- arima.sim(model = list(ma = c(0.9)), n = 400)
+series4 <- arima.sim(model = list(ar = c(-0.9)), n = 400)
+series5 <- arima.sim(model = list(ar = c(0.6, 0.2)), n = 400)
+series6 <- arima.sim(model = list(order = c(0, 1, 0)), n = 400)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ARMA(2, 2)
+
+$$
+y_{t} = \phi_0 + \phi_1y_{t - 1} + \phi_2y_{t - 2} + e_t + \theta_1 e_{t - 1} + \theta_2e_{t - 2}
+$$
+
+ARMA(0, 0)
+
+$$
+y_{t} = \phi_0 + e_t
+$$
+ARMA(1, 0)
+
+$$
+y_{t} = \phi_0 + \phi_1 y_{t - 1} + e_t
+$$
+
+ARMA(0, 1)
+
+$$
+y_{t} = \phi_0 + e_t + \theta_1 e_{t - 1}
+$$
+
+ARIMA(0, 1, 0)
+
+```{r}
+plot(series6)
+acf(series6, lag.max = 100)
+pacf(series6)
+```
+
+ARMA(2, 0)
+
+```{r}
+plot(series5)
+acf(series5)
+pacf(series5)
+```
+
+ARMA(1, 0) с отрицателен коефициент $\phi_1$.
+
+```{r}
+plot(series4)
+acf(series4)
+pacf(series4)
+```
+
+ARMA(0, 1)
+
+```{r}
+plot(series3)
+acf(series3)
+pacf(series3)
+```
+
+
+ARMA(1, 0)
+
+```{r}
+plot(series2)
+acf(series2)
+pacf(series2)
+```
+
+Напълно случаен процес:
+
+```{r}
+plot(series1)
+acf(series1)
+pacf(series1)
+```
+
+## Оценка на коефициентите в ARMA(p, q)
+
+```{r}
+plot(series1)
+acf(series1)
+```
+
+ARIMA(p, i, q)
+
+$$
+\text{order = c(0, 0, 0)}\\
+y_{t} = \phi_0 + e_t, \quad e_t \sim WN(\sigma^2)
+$$
+
+```{r}
+fit_1 <- arima(series1, order = c(0, 0, 0))
+fit_1
+```
+
+aic: Akaike Information Criterion
+
+```{r}
+acf(series2)
+pacf(series2)
+```
+
+$$
+\text{order = c(1, 0, 0)}\\
+y_{t} = \phi_0 + \phi_1 y_{t - 1} + e_{t}, e_{t} \sim WN(\sigma^2)
+$$
+
+```{r}
+fit_2 <- arima(series2, order = c(1, 0, 0))
+fit_2
+```
+
+Оценка на AR(1) модела с `arima`.
+
+$$
+\hat{y}_{t} = 0.1 + 0.91 \hat{y}_{t - 1}
+$$
+
+Остатъци:
+
+$$
+y_{t} - \hat{y}_{t}
+$$
+
+```{r}
+tsdiag(fit_2)
+```
+
+```{r}
+fit_3 <- arima(series2, order = c(0, 0, 0))
+fit_3
+```
+
+
+```{r}
+tsdiag(fit_3)
+```
+Истински модел, от който са генерирани данните в `series2` e
+
+$$
+y_{t} = 0.9y_{t - 1} + e_{t}, \quad e_t \sim WN(1)
+$$
+А в момента сме напаснали модел:
+$$
+y_{t} = \phi_0 + e_{t}
+$$
+
+```{r}
+fit_4 <- arima(series2, order = c(1, 0, 0))
+tsdiag(fit_4)
+```
+```{r}
+fit_5 <- arima(series2, order = c(2, 0, 0))
+tsdiag(fit_5)
+```
+
+```{r}
+fit_5 <- arima(series2, order = c(12, 0, 0))
+tsdiag(fit_5)
+```
+
+```{r}
+fit_4
+```
+
+
+
+```{r}
+fit_5
+```
+
+```{r}
+series_sim <- arima.sim(model = list(ar = c(0.9)), n = 400)
+fit_7 <- arima(series_sim, order = c(12, 0, 0))
+fit_7
+```
+
