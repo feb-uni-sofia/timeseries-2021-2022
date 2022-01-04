@@ -1,0 +1,83 @@
+---
+title: "DF-test-BG"
+author: "Boyko Amarov"
+date: "1/4/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(urca)
+```
+
+Случайно лутане (random walk)
+
+$$
+y_{t} = y_{t - 1} + u_{t}, u_t \sim WN(\sigma^2)
+$$
+Характеристично уравнение
+
+$$
+\lambda - 1 = 0 \implies 
+\lambda^* = 1
+$$
+Процесът има корен на характеристичното уравнение равен на единица (unit root).
+
+```{r}
+rw1 <- arima.sim(model = list(order = c(0, 1, 0)), n = 200)
+rw2 <- arima.sim(model = list(order = c(0, 1, 0)), n = 200)
+plot(rw1)
+plot(rw2)
+```
+
+
+```{r}
+plot(rw1, rw2)
+```
+```{r}
+summary(lm(rw2 ~ rw1))
+```
+
+spurious regression
+
+Линеен регресионен модел 
+
+$$
+y_{t}: \text{ случайно лутане 2}\\
+x_{t}: \text{ случайно лутане 1}\\
+y_{t} = \beta_0 + \beta_1 x_{t} + u_{t}, u_{t} \sim N(0, \sigma^2)
+$$
+$$
+\hat{y}_{t} = -1.86 + 0.19 x_{t}
+$$
+
+
+# Тестове за корени равни на единица
+
+AR(1) без константа
+
+$$
+y_{t} = \phi_1 y_{t - 1} + u_{t}, u_t \sim WN(\sigma^2)
+$$
+Ако този процес има unit root, тогава просто $\phi_1 = 1$.
+
+Искаме да тестваме хипотезата 
+
+$$
+H_0: \phi_1 = 1\\
+H_1: \phi < 1
+$$
+$$
+y_{t} = y_{t - 1} + u_{t}, u_t \sim WN(\sigma^2)\\
+\Delta y_{t} = y_{t} - y_{t - 1} \text{ първа разлика, first difference}\\
+y_{t} - y_{t - 1} = y_{t - 1} + u_{t} - y_{t - 1} = u_{t}\\
+\Delta y_{t} = u_{t}
+$$
+казваме, че процесът е интегриран от ред 1.
+
+```{r}
+summary(ur.df(rw1, type = "none"))
+```
