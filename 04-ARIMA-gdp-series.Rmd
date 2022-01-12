@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(xts)
 library(tidyverse)
+library(forecast)
 
 dt <- read_csv("https://raw.githubusercontent.com/feb-uni-sofia/timeseries-2021-2022/main/data/gdp_bg_qrt_2000-2017.csv")
 
@@ -68,15 +69,35 @@ fit_ar1 <- arima(growth_4, order = c(1, 0, 0))
 fit_ar1
 ```
 
-$$
-\hat{y}_{t} = 0.035 + 0.81 \hat{y}_{t - 1}
-$$
+```{r}
+tmp <- Arima(growth_4, order = c(1, 0, 0))
+tmp
+```
+
 ```{r}
 ## Prediction for one period after the 
 ## end of the observed series
-predict(fit_ar1, n.ahead = 1)
+predict(fit_ar1, n.ahead = 80)
 ```
 
+Approximate 95% interval for the expected value one period ahead of $t$.
+
+$$
+[\hat{y}_t - 2 SE(\hat{y}_t), \hat{y}_t - 2 SE(\hat{y}_t)]
+$$
+$$
+[\hat{y}_{t + 1} - 2 SE(\hat{y}_{t + 1}), \hat{y}_{t + 1} - 2 SE(\hat{y}_{t + 1})]
+$$
+$$
+[0.037 - 2\cdot 0.0175, 0.037 + 2\cdot 0.0175] = [0.002, 0.072]
+$$
+
+$$
+[\hat{y}_{t + 2} - 2 SE(\hat{y}_{t + 2}), \hat{y}_{t + 2} - 2 SE(\hat{y}_{t + 2})]
+$$
+$$
+[0.0368 - 2 \cdot 0.022, 0.0368 + 2 \cdot 0.022] = [-0.0072, 0.0808]
+$$
 
 ```{r}
 ## Prediction for 40 periods after the 

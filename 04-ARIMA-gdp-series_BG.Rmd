@@ -78,12 +78,6 @@ fit_ar1
 tsdiag(fit_ar1)
 ```
 
-$$
-\hat{y}_{t} = 3.5 + 0.81 \hat{y}_{t - 1}
-$$
-
-
-
 Ljung-Box тест
 
 Първи ред:
@@ -107,26 +101,46 @@ H_1: \text{Поне едно от } \rho_1, \rho_2, \ldots, \rho_k \neq 0
 $$
 
 ```{r}
-?predict.Arima
-predict(fit_ar1, n.ahead = 100)
+predict(fit_ar1, n.ahead = 2)
 ```
-
-
 
 ```{r}
 mean(growth_2, na.rm = TRUE)
 ```
 
 
+Прогнозен интервал
+$$
+[\hat{y}_{t + 1} - 2 SE(\hat{y}_{t+1}), \hat{y}_{t + 1} + 2 SE(\hat{y}_{t+1})]
+$$
+$$
+[3.72 - 2 \times 1.75, 3.72 + 2 \times 1.75] = [0.22, 7.22]
+$$
 
+95% прогнозен интервал
+$$
+[\hat{y}_{t + 2} - 2 SE(\hat{y}_{t+2}), \hat{y}_{t + 2} + 2 SE(\hat{y}_{t+2})]
+$$
 
+$$
+[3.68 - 2 \times 2.259, 3.68 + 2 \times 2.259] = [-0.838, 8.198]
+$$
+$$
+y_{t} = 3.5257 + 0.8152y_{t - 1} + u_{t}, u_{t} \sim WN(\sigma^2 = 3.066)
+$$
 
+```{r}
+n <- 71 - 4
 
+u_t_sim <- rnorm(n = n, sd = sqrt(3.066))
 
-
-
-
-
+bg_gdp_growth_sim <- 3.5257 + arima.sim(
+  model = list(ar = c(0.8152)),
+  n = n,
+  innov = u_t_sim
+  )
+plot(bg_gdp_growth_sim)
+```
 
 
 
