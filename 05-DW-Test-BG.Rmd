@@ -1,0 +1,179 @@
+---
+title: "DF-test-BG"
+author: "Boyko Amarov"
+date: "1/4/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## install.packages("urca")
+library(urca)
+```
+
+
+## Симулация 
+
+Симулираме два времеви реда от процес на случайно лутане (random walk)
+
+$$
+y_{t} = y_{t - 1} + u_{t}
+$$
+ARIMA(p, d, q)
+ARIMA(0, 1, 0)
+
+```{r}
+rw1 <- arima.sim(model = list(order = c(0, 1, 0)), n = 200)
+rw2 <- arima.sim(model = list(order = c(0, 1, 0)), n = 200)
+```
+
+
+```{r}
+plot(rw1)
+plot(rw2)
+```
+Линеен регресионен модел:
+
+$$
+rw_{2,t} = \beta_0 + \beta_1 rw_{1, t} + e_t
+$$
+
+
+```{r}
+summary(lm(rw2 ~ rw1))
+```
+## Степен на интеграция
+
+$$
+y_{t} = y_{t - 1} + u_{t}\\
+y_{t} - y_{t - 1} =  u_{t}\\
+\Delta y_{t} = u_{t}
+$$
+$y_{t}$ не е стационарен процес, защото има корен равен на единица. $\Delta y_{t}$ е
+стационарен процес, тъй като $u_{t}$ е стационарен процес. Казваме, че $y_{t}$ е интегриран
+от първа степен.
+
+## Тест за корен равен на единица при AR(1)
+
+$$
+y_{t} = \phi_1 y_{t - 1} + u_{t} \\
+y_{t} = \phi_1 L y_{t} + u_{t}\\
+\underbrace{(1 - \phi_1 L)}_{\text{Полином на лаг- оператора}} y_{t} = u_{t}
+$$
+$$
+\lambda - \phi_1 = 0
+$$
+
+Характеристично уравнение на AR(1)
+
+$$
+\lambda - \phi_1 = 0
+$$
+
+$$
+\phi_1 = 1 \implies \text{ характеристичното уравнение има корен равен на единица (unit root)}
+$$
+
+$$
+\underbrace{y_{t} - y_{t - 1}}_{\Delta y_{t}} = \phi_1 y_{t - 1} + u_{t} - y_{t - 1}\\
+\Delta y_{t}= (\phi_1  - 1)y_{t - 1} + u_{t}\\
+$$
+
+$$
+H_{0}: \phi_1 - 1 = 0 \iff \phi_1 = 1\\
+H_1: \phi_1 < 1
+$$
+$$
+\phi_1 < 1 \implies \phi_1 - 1 < 0s
+$$
+
+# Симулация 1 (случайно лутане)
+
+$$
+y_{t} = y_{t - 1} + u_{t}, u_{t} \sim WN(1)
+$$
+
+```{r}
+set.seed(543)
+rw <- arima.sim(model = list(order = c(0, 1, 0)), n = 200)
+plot(rw)
+```
+
+```{r}
+## ur: unit root, df: Dickey-Fuller
+# ?ur.df
+summary(ur.df(rw, type = "none", lags = 0))
+```
+lm(formula = z.diff ~ z.lag.1 - 1)
+
+z.diff: $\Delta y_{t}$
+z.lag.1: $y_{t - 1}$
+-1: означава, че в линейния регресионен модел няма константа
+
+Сравняваме стойността на t-статистиката: -0.703 с критичните стойности 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau1 -2.58 -1.95 -1.62
+
+-0.703 > -1.62 => не можем да отхвърлим нулевата хипотеза (процесът има корен равен на единица)
+
+## Симулация 2: (стационарен AR(1))
+
+$$
+y_{t} = 10 + 0.7 y_{t - 1} + u_t, u_t \sim WN(1)
+$$
+```{r}
+set.seed(4323)
+ar1_level <- 10 + arima.sim(model = list(ar = c(0.7)), n = 200)
+plot(ar1_level)
+```
+
+```{r}
+summary(ur.df(ar1_level, type = "none", lags = 0))
+```
+```{r}
+summary(ur.df(ar1_level, type = "drift", lags = 0))
+```
+      1pct  5pct 10pct
+tau2 -3.46 -2.88 -2.57
+
+-5.106 < -3.46 => отхвърляме нулевата хипотеза при ниво на значимост 1 процент.
+
+
+## Симулация 3: AR(1) с тренд
+
+$$
+y_{t} = 10 + 0.1t +  0.7 y_{t - 1} + u_t, u_t \sim WN(1)
+$$
+
+```{r}
+set.seed(4323)
+ar1_trend <- 10 + 0.1 * (1:200) + arima.sim(model = list(ar = c(0.7)), n = 200)
+plot(ar1_trend)
+```
+
+```{r}
+summary(ur.df(ar1_trend, type = "drift", lags = 0))
+```
+
+Не можем да отхвърлим нулевата хипотеза (процесът има корен = 1), защото
+-1.0733 > -2.57.
+
+
+```{r}
+summary(ur.df(ar1_trend, type = "trend", lags = 0))
+```
+Сравняваме стойността на t-статистиката за $y_{t - 1}$ (z.lag.1) с критичните стойности:
+
+      1pct  5pct 10pct
+tau3 -3.99 -3.43 -3.13
+
+-5.216 < -3.99 => отхвърляме нулевата хипотеза, че времевият ред има корен равен на единица.
+
+$$
+t-статистика = \frac{-0.243368 - 0}{0.046659} = -5.2158
+$$
