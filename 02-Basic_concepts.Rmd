@@ -85,7 +85,8 @@ ggplot(ts_all_lags, aes(x = ts_random_l1, y = ts_random)) +
 $$
 y_1, y_2, \ldots, y_T
 $$
-## World of mathematics (properties of baskets)
+
+## World of mathematics (properties of generators)
 
 Mathematical expectation (expected value, mean)
 $$
@@ -94,13 +95,14 @@ $$
 this will describe the average (in some sense) of the numbers in the basket.
 
 $$
-Var(y_t)
+Var(y_t) = E(y_t - Ey_t)^2
 $$
 Variance: this will describe how different the number in the basket are.
 
 $$
-Cov(y_t, y_{t - 1})
+Cov(y_t, y_{t - 1}) = E(y_t - Ey_{t})(y_t - Ey_{t - 1})
 $$
+
 Covariance: this will describe how the different baskets are related.
 
 ## World of observations
@@ -137,10 +139,6 @@ y <- c(2, 3, 10)
 mean(y)
 var(y) # Up to the scaling factor
 ```
-
-
-
-
 
 3. Empirical (sample) covariance
 
